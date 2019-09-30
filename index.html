@@ -18,6 +18,11 @@
     After selecting two files, hit the "compare" button.
     The total number of overlap will be shown as well as the first 100 overlapping rsids.
 </p>
+<p>
+    You can download the full comparison as a csv file.
+    All rsids in the source file will be exported.
+    The first column is rsid, and the second column is true/false.
+</p>
 <table>
     <tbody>
     <tr>
@@ -31,7 +36,12 @@
         <td><span id="f1-count"></span></td>
     </tr>
     <tr>
-        <td><button id="compare" onclick="compare();">Compare</button></td>
+        <td>
+            <button id="compare" onclick="compare(false);">Compare</button>
+        </td>
+        <td>
+            <button id="compare-download" onclick="compare(true);">Compare & Download</button>
+        </td>
     </tr>
     <tr>
         <th>Overlap</th>
@@ -47,6 +57,7 @@
     const countSpans = [document.getElementById('f0-count'), document.getElementById('f1-count')];
     const overlapSpan = document.getElementById('overlap-count');
     const list = document.getElementById('overlap-list');
+    const tmpDownload = document.createElement('a');
 
     // https://stackoverflow.com/a/42316936/3248736
     function readFile(input, i) {
@@ -68,15 +79,20 @@
         reader.readAsText(file);
     }
 
-    function compare() {
+    function compare(download) {
         if (rsids[0] === null || rsids[1] === null)
             return;
 
         let count = 0;
         list.innerHTML = '';
 
+        let data = 'rsid,overlap\n';
+
         for (const x of rsids[0]) {
-            if (!rsids[1].has(x))
+            const overlap = rsids[1].has(x);
+            data = data + `${x},${overlap}\n`;
+
+            if (!overlap)
                 continue;
 
             count++;
@@ -88,6 +104,14 @@
         }
 
         overlapSpan.innerText = count;
+
+        if (download) {
+            const blob = new Blob([data], {type: 'text/csv'});
+
+            tmpDownload.href = URL.createObjectURL(blob);
+            tmpDownload.download = 'overlap.csv';
+            tmpDownload.click();
+        }
     }
 </script>
 </body>
