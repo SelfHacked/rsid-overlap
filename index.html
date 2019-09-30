@@ -14,6 +14,10 @@
 <p>
     After selecting each file, the number of rsids found will be shown next to it.
 </p>
+<p>
+    After selecting two files, hit the "compare" button.
+    The total number of overlap will be shown as well as the first 100 overlapping rsids.
+</p>
 <table>
     <tbody>
     <tr>
@@ -26,11 +30,23 @@
         <td><input id="f1" type="file" name="f1" onchange="readFile(this, 1);"></td>
         <td><span id="f1-count"></span></td>
     </tr>
+    <tr>
+        <td><button id="compare" onclick="compare();">Compare</button></td>
+    </tr>
+    <tr>
+        <th>Overlap</th>
+        <td><span id="overlap-count"></span></td>
+    </tr>
+    </tbody>
 </table>
+
+<ul id="overlap-list"></ul>
 
 <script type="text/javascript">
     const rsids = [null, null];
     const countSpans = [document.getElementById('f0-count'), document.getElementById('f1-count')];
+    const overlapSpan = document.getElementById('overlap-count');
+    const list = document.getElementById('overlap-list');
 
     // https://stackoverflow.com/a/42316936/3248736
     function readFile(input, i) {
@@ -50,6 +66,28 @@
         };
 
         reader.readAsText(file);
+    }
+
+    function compare() {
+        if (rsids[0] === null || rsids[1] === null)
+            return;
+
+        let count = 0;
+        list.innerHTML = '';
+
+        for (const x of rsids[0]) {
+            if (!rsids[1].has(x))
+                continue;
+
+            count++;
+
+            if (count > 100)
+                continue;
+
+            list.innerHTML += `<li>${x}</li>`;
+        }
+
+        overlapSpan.innerText = count;
     }
 </script>
 </body>
