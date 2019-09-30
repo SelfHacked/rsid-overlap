@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RSID Overlap</title>
+</head>
+
+<body>
+<p>
+    The program will find all instances of "rs"+number in each file,
+    and find the overlap between them.
+    There is no need to preprocess the files.
+</p>
+<p>
+    After selecting each file, the number of rsids found will be shown next to it.
+</p>
+<table>
+    <tbody>
+    <tr>
+        <th>Source file</th>
+        <td><input id="f0" type="file" name="f0" onchange="readFile(this, 0);"></td>
+        <td><span id="f0-count"></span></td>
+    </tr>
+    <tr>
+        <th>Compare to</th>
+        <td><input id="f1" type="file" name="f1" onchange="readFile(this, 1);"></td>
+        <td><span id="f1-count"></span></td>
+    </tr>
+</table>
+
+<script type="text/javascript">
+    const rsids = [null, null];
+    const countSpans = [document.getElementById('f0-count'), document.getElementById('f1-count')];
+
+    // https://stackoverflow.com/a/42316936/3248736
+    function readFile(input, i) {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            const file = event.target.result;
+            const match = file.match(/rs[0-9]+/g);
+            rsids[i] = new Set(match);
+
+            countSpans[i].innerText = rsids[i].size;
+        };
+
+        reader.onerror = (event) => {
+            alert(event.target.error.name);
+        };
+
+        reader.readAsText(file);
+    }
+</script>
+</body>
+</html>
